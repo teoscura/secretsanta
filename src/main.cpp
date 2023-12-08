@@ -17,12 +17,12 @@ struct gift{
 
 persona *obtain_memory1(int n){
     //persona *pointer = new persona[n];
-    persona *pointer = (persona*)malloc(sizeof(persona)*n);
+    persona *pointer = (persona*) new persona[n];
     return pointer;
 }
 
 gift *obtain_memory2(int n){
-    gift *pointer = (gift*)malloc(sizeof(gift)*n);
+    gift *pointer = (gift*) new gift[n];
     return pointer;
 }
 
