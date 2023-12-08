@@ -1,3 +1,5 @@
+
 build:
-	gcc ./src/*.cpp -o ./bin/main
+	g++ ./src/*.cpp -o ./bin/main
 	./bin/main
+
