@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cmath>
 
 #define MAX 1000
 
@@ -15,6 +14,14 @@ struct persona {
 struct gift{
     std::string gifter, reciever;
 };
+
+struct t_node {
+    t_node *next;
+    std::string name;
+};
+
+typedef t_node* ptr_node;
+
 
 persona *obtain_memory1(int n){
     //persona *pointer = new persona[n];
@@ -41,6 +48,18 @@ gift *obtain_memory2(int n){
     }
 }
 
+ptr_node obtain_memory3(){
+    ptr_node pointer= new t_node;
+    if(pointer){
+        std::cout<<"Pointer Created Successfully\n";
+        return pointer;
+    }
+    else{
+        std::cout<<"ERROR IN OBTAINING POINTER FOR NEW NODE\n";
+        return NULL;
+    }
+}
+
 persona *fill_list(persona *list, int n){
     int i;
     std::string nome;
@@ -57,7 +76,7 @@ persona *fill_list(persona *list, int n){
 }
 
 /*
-gift *create_couples(persona *list, gift *regali, int n){
+gift *create_couples(persona *list, gift *regali, int n){ wrong impl.
     int i, j;
     for(i=0;i<n;i++){
         do{
@@ -70,8 +89,7 @@ gift *create_couples(persona *list, gift *regali, int n){
     }
     return regali;
 }
-*/
-
+//this one is boring as fuck and lazy
 gift *create_couples_lollosversion(persona *list, gift *regali, int n){
     int i, j;
     for(i=0;i<n;i++){
@@ -79,6 +97,63 @@ gift *create_couples_lollosversion(persona *list, gift *regali, int n){
         else j = 0;
         regali[i].gifter = list[i].name;
         regali[i].reciever = list[j].name;
+    }
+    return regali;
+}
+*/
+
+ptr_node build_tree(ptr_node start, persona *list, int n){
+    int i, j;
+    ptr_node tmp;
+    tmp = start;
+    for(i=0;i<n;i++){
+        if(i==0){
+            j = rand()%n;
+            tmp->name = list[j].name;
+            list[j].selected = true;
+            tmp->next = obtain_memory3();
+            if(tmp->next != NULL){
+                tmp = tmp->next;
+            }
+            else{
+                std::cout<<"NULLPTR EXCEPTION, BREAKING OUT\n";
+                return NULL;
+            }
+        }
+        else if(i==n-1){
+            do{
+                j=rand()%n;
+            }while(list[j].selected);
+            tmp->name = list[j].name;
+            list[j].selected = true;
+            tmp->next = start;
+        }
+        else{
+            do{
+               j=rand()%n; 
+            }while(list[j].selected);
+            tmp->name = list[j].name;
+            list[j].selected = true;
+            tmp->next = obtain_memory3();
+            if(tmp->next != NULL){
+                tmp = tmp->next;
+            }
+            else{
+                std::cout<<"NULLPTR EXCEPTION, BREAKING OUT\n";
+                return NULL;
+            }
+        }
+    }
+    return start;
+}
+
+gift *create_couples_from_tree(ptr_node start, gift *regali, int n){
+    int i;
+    ptr_node tmp = start;
+    for(i=0;i<n;i++){
+        regali[i].gifter = tmp->name;
+        regali[i].reciever = tmp->next->name;
+        tmp = tmp->next;
     }
     return regali;
 }
@@ -100,6 +175,8 @@ int main(){
     int i, n;
     persona *lista;
     gift *regali;
+    ptr_node tree;
+    tree = obtain_memory3();
     //ottieni numero persone lista
     do{
         std::cout << "Inserire numero di persone della lista\n";
@@ -109,10 +186,12 @@ int main(){
     lista = obtain_memory1(n);
     //popola la lista
     lista = fill_list(lista, n);
+    //costruisci albero regali
+    tree = build_tree(tree, lista, n);
     //ottieni spazio di memoria per gli assegnamenti
     regali = obtain_memory2(n);
     //decidi chi regala a chi
-    regali = create_couples_lollosversion(lista, regali, n);
+    regali = create_couples_from_tree(tree, regali, n);
     //scrivi a ogni persona la sua persona in file segreti segretissimi uoo
     write_gifts(regali, n);
     //generalcleanup
