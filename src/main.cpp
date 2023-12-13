@@ -5,8 +5,7 @@
 
 #define MAX 1000
 
-struct persona {
-    
+struct person {
     std::string name;
     bool selected;
 };
@@ -22,10 +21,9 @@ struct t_node {
 
 typedef t_node* ptr_node;
 
-
-persona *obtain_memory1(int n){
-    //persona *pointer = new persona[n];
-    persona *pointer = (persona*) new persona[n];
+person *obtain_memory1(int n){
+    //person *pointer = new person[n];
+    person *pointer = (person*) new person[n];
     if(pointer){
         std::cout<<"Pointer Created Successfully\n";
         return pointer;
@@ -60,12 +58,11 @@ ptr_node obtain_memory3(){
     }
 }
 
-persona *fill_list(persona *list, int n){
+person *fill_list(person *list, int n){
     int i;
-    std::string nome;
     for(i=0;i<n;i++){
         do{ 
-            std::cout<< "Inserire nome della persona allo slot: " << i+1 << std::endl;
+            std::cout<< "Input name of person in slot #" << i+1 << std::endl;
             std::cin >> list[i].name;
         }while(list[i].name.length() <= 0);
     }
@@ -102,7 +99,7 @@ gift *create_couples_lollosversion(persona *list, gift *regali, int n){
 }
 */
 
-ptr_node build_tree(ptr_node start, persona *list, int n){
+ptr_node build_tree(ptr_node start, person *list, int n){
     int i, j;
     ptr_node tmp;
     tmp = start;
@@ -147,15 +144,15 @@ ptr_node build_tree(ptr_node start, persona *list, int n){
     return start;
 }
 
-gift *create_couples_from_tree(ptr_node start, gift *regali, int n){
+gift *create_couples_from_tree(ptr_node start, gift *gifts, int n){
     int i;
     ptr_node tmp = start;
     for(i=0;i<n;i++){
-        regali[i].gifter = tmp->name;
-        regali[i].reciever = tmp->next->name;
+        gifts[i].gifter = tmp->name;
+        gifts[i].reciever = tmp->next->name;
         tmp = tmp->next;
     }
-    return regali;
+    return gifts;
 }
 
 void writetofile(std::string filename, std::string contents){
@@ -164,39 +161,39 @@ void writetofile(std::string filename, std::string contents){
     fp.close();
 }
 
-void write_gifts(gift *regali, int n){
+void write_gifts(gift *gifts, int n){
     int i;
     for(i=0;i<n;i++){
-        writetofile(regali[i].gifter, regali[i].reciever);
+        writetofile(gifts[i].gifter, gifts[i].reciever);
     }
 }
 
 int main(){
     int i, n;
-    persona *lista;
-    gift *regali;
+    person *list;
+    gift *gifts;
     ptr_node tree;
     tree = obtain_memory3();
     //ottieni numero persone lista
     do{
-        std::cout << "Inserire numero di persone della lista\n";
+        std::cout << "Please insert how many people are taking part in your secret santa:\n";
         std::cin >> n;
     }while( n < 1 || n > MAX);
     //ottieni spazio in memoria per la lista
-    lista = obtain_memory1(n);
+    list = obtain_memory1(n);
     //popola la lista
-    lista = fill_list(lista, n);
+    list = fill_list(list, n);
     //costruisci albero regali
-    tree = build_tree(tree, lista, n);
+    tree = build_tree(tree, list, n);
     //ottieni spazio di memoria per gli assegnamenti
-    regali = obtain_memory2(n);
+    gifts = obtain_memory2(n);
     //decidi chi regala a chi
-    regali = create_couples_from_tree(tree, regali, n);
+    gifts = create_couples_from_tree(tree, gifts, n);
     //scrivi a ogni persona la sua persona in file segreti segretissimi uoo
-    write_gifts(regali, n);
+    write_gifts(gifts, n);
     //generalcleanup
-    delete [] lista;
-    delete [] regali;
+    delete [] list;
+    delete [] gifts;
     //chiudo
     return 0;
 }
